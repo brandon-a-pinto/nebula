@@ -17,12 +17,28 @@ services:
     build:
       context: ./user-service
       dockerfile: ./user-service.dockerfile
+    env_file: .env
     restart: always
     ports:
       - "8081:80"
     deploy:
       mode: replicated
       replicas: 1
+
+  user-postgres:
+    image: 'postgres:15-alpine'
+    restart: always
+    ports:
+      - "9051:5432"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - POSTGRES_USER=${USER_DB_USERNAME}
+      - POSTGRES_PASSWORD=${USER_DB_PASSWORD}
+      - POSTGRES_DB=${USER_DB_NAME}
+    volumes:
+      - ./user-service/data/postgres/:/var/lib/postgresql/data/
 
   post-service:
     build:

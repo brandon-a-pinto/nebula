@@ -2,6 +2,11 @@ BROKER_BINARY=broker
 USER_BINARY=user
 POST_BINARY=post
 
+prepare:
+	@echo "Creating .env file..."
+	cp .env.example .env
+	@echo "Done!"
+
 up:
 	@echo "Starting Docker images..."
 	docker-compose up -d
