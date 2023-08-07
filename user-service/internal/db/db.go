@@ -14,7 +14,7 @@ import (
 var PI PostgresInstance
 
 type PostgresInstance struct {
-	DB *sql.DB
+	Postgres *sql.DB
 }
 
 func PostgreSQLConnection() {
@@ -52,7 +52,7 @@ func PostgreSQLConnection() {
 
 	// Set Postgres instance
 	PI = PostgresInstance{
-		DB: db,
+		Postgres: db,
 	}
 }
 
