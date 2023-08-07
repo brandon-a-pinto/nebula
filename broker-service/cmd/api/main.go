@@ -1,15 +1,18 @@
 package main
 
 import (
+	"github.com/brandon-a-pinto/nebula/broker-service/internal/handler"
 	"github.com/gofiber/fiber/v2"
+)
+
+var (
+	h = handler.NewBrokerHandler()
 )
 
 func main() {
 	app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON("[GET] Broker Service")
-	})
+	app.Post("/", h.HandleBroker)
 
 	app.Listen(":80")
 }
