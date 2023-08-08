@@ -1,4 +1,5 @@
 BROKER_BINARY=broker
+LOGGER_BINARY=logger
 USER_BINARY=user
 POST_BINARY=post
 
@@ -12,7 +13,7 @@ up:
 	docker-compose up -d
 	@echo "Done!"
 
-up_build: build_broker build_user build_post
+up_build: build_broker build_logger build_user build_post
 	@echo "Stopping docker-compose..."
 	docker-compose down
 	@echo "Building and starting Docker images..."
@@ -27,6 +28,11 @@ down:
 build_broker:
 	@echo "Building broker binary..."
 	@cd broker-service && env GOOS=linux CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api
+	@echo "Done!"
+
+build_logger:
+	@echo "Building logger binary..."
+	@cd logger-service && env GOOS=linux CGO_ENABLED=0 go build -o ${LOGGER_BINARY} ./cmd/api
 	@echo "Done!"
 
 build_user:

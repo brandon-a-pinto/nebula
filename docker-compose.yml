@@ -6,9 +6,22 @@ services:
     build:
       context: ./broker-service
       dockerfile: ./broker-service.dockerfile
+    env_file: .env
     restart: always
     ports:
       - "8080:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+      
+  logger-service:
+    build:
+      context: ./logger-service
+      dockerfile: ./logger-service.dockerfile
+    env_file: .env
+    restart: always
+    ports:
+      - "8081:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -20,16 +33,28 @@ services:
     env_file: .env
     restart: always
     ports:
-      - "8081:80"
+      - "8082:80"
     deploy:
       mode: replicated
       replicas: 1
 
+  post-service:
+    build:
+      context: ./post-service
+      dockerfile: ./post-service.dockerfile
+    env_file: .env
+    restart: always
+    ports:
+      - "8083:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+     
   user-postgres:
     image: 'postgres:15-alpine'
     restart: always
     ports:
-      - "9051:5432"
+      - "9001:5432"
     deploy:
       mode: replicated
       replicas: 1
@@ -39,14 +64,16 @@ services:
       - POSTGRES_DB=${USER_DB_NAME}
     volumes:
       - ./user-service/data/postgres/:/var/lib/postgresql/data/
-
-  post-service:
-    build:
-      context: ./post-service
-      dockerfile: ./post-service.dockerfile
+      
+  logger-mongo:
+    image: 'mongo:5'
     restart: always
     ports:
-      - "8082:80"
+      - "9002:5432"
     deploy:
       mode: replicated
       replicas: 1
+    environment:
+      - MONGO_URL=${LOGGER_DB_URI}
+    volumes:
+      - ./user-service/data/postgres/:/var/lib/postgresql/data/
