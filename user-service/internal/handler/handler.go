@@ -1,6 +1,10 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/brandon-a-pinto/nebula/user-service/internal/db"
@@ -27,7 +31,7 @@ func (h *User) HandlePostUser(c *fiber.Ctx) error {
 		})
 	}
 
-	// Generates encrypted password
+	// Generate encrypted password
 	encpw, err := bcrypt.GenerateFromPassword([]byte(params.Password), 12)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -70,10 +74,46 @@ func (h *User) HandlePostUser(c *fiber.Ctx) error {
 		})
 	}
 
+	// Log operation
+	err = logRequest("users", fmt.Sprintf("Account created: %s", params.Email))
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"msg":     "Logger error",
+			"error":   err,
+			"success": false,
+		})
+	}
+
 	// Success response
 	return c.JSON(fiber.Map{
 		"msg":     "User created successfully",
 		"data":    res,
 		"success": true,
 	})
+}
+
+func logRequest(name string, data any) error {
+	var log struct {
+		Name string `json:"name"`
+		Data any    `json:"data"`
+	}
+
+	log.Name = name
+	log.Data = data
+
+	jsonValue, _ := json.Marshal(log)
+	req, err := http.NewRequest(http.MethodPost, "http://logger-service", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
 }

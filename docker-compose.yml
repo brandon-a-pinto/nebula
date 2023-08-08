@@ -69,7 +69,7 @@ services:
     image: 'mongo:5'
     restart: always
     ports:
-      - "9002:5432"
+      - "9002:27017"
     deploy:
       mode: replicated
       replicas: 1
