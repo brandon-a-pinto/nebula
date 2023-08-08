@@ -27,8 +27,18 @@ func (h *Broker) HandleBroker(c *fiber.Ctx) error {
 	}
 
 	switch params.Action {
-	case "create_user":
+	case "user_create":
 		res, err := createUserRequest(params.Data)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"msg":     "Request failed",
+				"error":   err,
+				"success": false,
+			})
+		}
+		return c.JSON(res)
+	case "log":
+		res, err := logItem(params.Log)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"msg":     "Request failed",
@@ -49,6 +59,26 @@ func (h *Broker) HandleBroker(c *fiber.Ctx) error {
 func createUserRequest(params models.CreateUserParams) (interface{}, error) {
 	jsonValue, _ := json.Marshal(params)
 	req, err := http.NewRequest(http.MethodPost, "http://user-service/api/v1", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	var jsonData interface{}
+	json.NewDecoder(res.Body).Decode(&jsonData)
+	return jsonData, nil
+}
+
+func logItem(params models.LogParams) (interface{}, error) {
+	jsonValue, _ := json.Marshal(params)
+	req, err := http.NewRequest(http.MethodPost, "http://logger-service", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		return nil, err
 	}

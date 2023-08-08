@@ -3,6 +3,7 @@ package models
 type Request struct {
 	Action string           `json:"action"`
 	Data   CreateUserParams `json:"data,omitempty"`
+	Log    LogParams        `json:"log,omitempty"`
 }
 
 type CreateUserParams struct {
@@ -11,4 +12,9 @@ type CreateUserParams struct {
 	DisplayName          string `json:"displayName"`
 	Password             string `json:"password"`
 	PasswordConfirmation string `json:"passwordConfirmation"`
+}
+
+type LogParams struct {
+	Name string `json:"name"`
+	Data any    `json:"data"`
 }
