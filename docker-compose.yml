@@ -73,7 +73,6 @@ services:
     deploy:
       mode: replicated
       replicas: 1
-    environment:
-      - MONGO_URL=${LOGGER_DB_URI}
     volumes:
-      - ./user-service/data/postgres/:/var/lib/postgresql/data/
+      - ./logger-service/data/:/data/db
+

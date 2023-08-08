@@ -1,13 +1,20 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/brandon-a-pinto/nebula/logger-service/internal/db"
+	"github.com/brandon-a-pinto/nebula/logger-service/internal/handler"
+	"github.com/gofiber/fiber/v2"
+)
+
+var (
+	h = handler.NewLoggerHandler()
+)
 
 func main() {
+	db.MongoDBConnection()
 	app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON("[GET] Logger Service")
-	})
+	app.Post("/", h.HandleLogger)
 
 	app.Listen(":80")
 }
