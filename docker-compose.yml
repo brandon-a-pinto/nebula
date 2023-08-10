@@ -25,6 +25,18 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      
+  listener-service:
+    build:
+      context: ./listener-service
+      dockerfile: ./listener-service.dockerfile
+    env_file: .env
+    restart: always
+    ports:
+      - "8082:80"
+    deploy:
+      mode: replicated
+      replicas: 1
 
   user-service:
     build:
@@ -33,7 +45,7 @@ services:
     env_file: .env
     restart: always
     ports:
-      - "8082:80"
+      - "8083:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -45,16 +57,37 @@ services:
     env_file: .env
     restart: always
     ports:
-      - "8083:80"
+      - "8084:80"
     deploy:
       mode: replicated
       replicas: 1
      
+  logger-mongo:
+    image: 'mongo:5'
+    restart: always
+    ports:
+      - "9000:27017"
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - ./logger-service/data/mongodb/:/data/db
+
+  listener-rabbitmq:
+    image: 'rabbitmq:3.9-alpine'
+    ports:
+      - "9001:5672"
+    deploy:
+      mode: replicated
+      replicas: 1
+    volumes:
+      - ./listener-service/data/rabbitmq/:/var/lib/rabbitmq/
+
   user-postgres:
     image: 'postgres:15-alpine'
     restart: always
     ports:
-      - "9001:5432"
+      - "9002:5432"
     deploy:
       mode: replicated
       replicas: 1
@@ -64,15 +97,3 @@ services:
       - POSTGRES_DB=${USER_DB_NAME}
     volumes:
       - ./user-service/data/postgres/:/var/lib/postgresql/data/
-      
-  logger-mongo:
-    image: 'mongo:5'
-    restart: always
-    ports:
-      - "9002:27017"
-    deploy:
-      mode: replicated
-      replicas: 1
-    volumes:
-      - ./logger-service/data/:/data/db
-
