@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
+	"github.com/brandon-a-pinto/nebula/listener-service/event"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
@@ -12,6 +12,15 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("connected")
 	defer conn.Close()
+
+	consumer, err := event.NewConsumer(conn)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = consumer.Listen([]string{"log.INFO", "log.WARN", "log.ERROR"})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
