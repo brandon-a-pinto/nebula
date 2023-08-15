@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/brandon-a-pinto/nebula/broker-service/internal/event"
 	"github.com/brandon-a-pinto/nebula/broker-service/internal/models"
+	"github.com/brandon-a-pinto/nebula/broker-service/internal/rabbitmq"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -38,7 +40,7 @@ func (h *Broker) HandleBroker(c *fiber.Ctx) error {
 		}
 		return c.JSON(res)
 	case "log":
-		res, err := logItem(params.Log)
+		err := logWithRabbitMQ(params.Log)
 		if err != nil {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 				"msg":     "Request failed",
@@ -46,7 +48,7 @@ func (h *Broker) HandleBroker(c *fiber.Ctx) error {
 				"success": false,
 			})
 		}
-		return c.JSON(res)
+		return c.JSON("Logged successfully")
 	default:
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"msg":     "Unknown action",
@@ -94,4 +96,33 @@ func logItem(params models.LogParams) (interface{}, error) {
 	var jsonData interface{}
 	json.NewDecoder(res.Body).Decode(&jsonData)
 	return jsonData, nil
+}
+
+func logWithRabbitMQ(params models.LogParams) error {
+	err := pushToQueue(params.Name, params.Data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func pushToQueue(name string, data any) error {
+	emitter, err := event.NewEventEmitter(rabbitmq.RMQ.Conn)
+	if err != nil {
+		return err
+	}
+
+	req := models.LogParams{
+		Name: name,
+		Data: data,
+	}
+
+	jsonValue, _ := json.Marshal(req)
+	err = emitter.Push(string(jsonValue), "log.INFO")
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

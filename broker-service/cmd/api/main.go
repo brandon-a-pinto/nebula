@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/brandon-a-pinto/nebula/broker-service/internal/handler"
+	"github.com/brandon-a-pinto/nebula/broker-service/internal/rabbitmq"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -10,6 +11,7 @@ var (
 )
 
 func main() {
+	rabbitmq.RabbitMQConnection()
 	app := fiber.New()
 
 	app.Post("/", h.HandleBroker)
