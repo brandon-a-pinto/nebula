@@ -24,3 +24,8 @@ type CreateUserParams struct {
 	Password             string `json:"password"`
 	PasswordConfirmation string `json:"passwordConfirmation"`
 }
+
+type LogParams struct {
+	Name string `json:"name"`
+	Data any    `json:"data"`
+}

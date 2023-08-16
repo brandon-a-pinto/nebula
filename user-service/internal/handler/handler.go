@@ -75,7 +75,7 @@ func (h *User) HandlePostUser(c *fiber.Ctx) error {
 	}
 
 	// Log operation
-	err = logRequest("users", fmt.Sprintf("Account created: %s", params.Email))
+	err = logRequest("log", models.LogParams{Name: "users", Data: fmt.Sprintf("Account created: %s", params.Email)})
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"msg":     "Logger error",
@@ -92,17 +92,17 @@ func (h *User) HandlePostUser(c *fiber.Ctx) error {
 	})
 }
 
-func logRequest(name string, data any) error {
-	var log struct {
-		Name string `json:"name"`
-		Data any    `json:"data"`
+func logRequest(action string, log models.LogParams) error {
+	var request struct {
+		Action string           `json:"action"`
+		Log    models.LogParams `json:"log"`
 	}
 
-	log.Name = name
-	log.Data = data
+	request.Action = action
+	request.Log = log
 
-	jsonValue, _ := json.Marshal(log)
-	req, err := http.NewRequest(http.MethodPost, "http://logger-service", bytes.NewBuffer(jsonValue))
+	jsonValue, _ := json.Marshal(request)
+	req, err := http.NewRequest(http.MethodPost, "http://broker-service", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		return err
 	}
