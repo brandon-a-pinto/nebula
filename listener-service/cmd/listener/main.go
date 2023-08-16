@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/brandon-a-pinto/nebula/listener-service/event"
+	"github.com/brandon-a-pinto/nebula/listener-service/internal/event"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
