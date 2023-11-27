@@ -1,0 +1,9 @@
+go 1.20
+
+use (
+	./broker-service
+	./logger-service
+	./listener-service
+	./post-service
+	./user-service
+)

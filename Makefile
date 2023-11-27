@@ -5,7 +5,7 @@ USER_BINARY=user
 POST_BINARY=post
 
 prepare:
-	@echo "Creating .env file..."
+	@echo "Generating .env file..."
 	cp .env.example .env
 	@echo "Done!"
 
@@ -28,7 +28,7 @@ down:
 
 build_broker:
 	@echo "Building broker binary..."
-	@cd broker-service && env GOOS=linux CGO_ENABLED=0 go build -o ${BROKER_BINARY} ./cmd/api
+	@cd broker-service && env GOOS=linux CGO_ENABLED=0 go build -o ./build/bin/${BROKER_BINARY} ./cmd/broker
 	@echo "Done!"
 
 build_logger:
@@ -43,10 +43,16 @@ build_listener:
 
 build_user:
 	@echo "Building user binary..."
-	@cd user-service && env GOOS=linux CGO_ENABLED=0 go build -o ${USER_BINARY} ./cmd/api
+	@cd user-service && env GOOS=linux CGO_ENABLED=0 go build -o ./build/bin/${USER_BINARY} ./cmd/user
 	@echo "Done!"
 
 build_post:
 	@echo "Building post binary..."
-	@cd post-service && env GOOS=linux CGO_ENABLED=0 go build -o ${POST_BINARY} ./cmd/api
+	@cd post-service && env GOOS=linux CGO_ENABLED=0 go build -o ./build/bin/${POST_BINARY} ./cmd/post
+	@echo "Done!"
+
+grpc:
+	@echo "Generating gRPC files..."
+	@cd user-service && protoc --go_out=. --go-grpc_out=. ./internal/main/grpc/protofile/*.proto
+	@cd broker-service && protoc --go_out=. --go-grpc_out=. ./internal/main/grpc/protofile/*.proto
 	@echo "Done!"

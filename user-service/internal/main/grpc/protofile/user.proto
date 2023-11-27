@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "internal/main/grpc/pb";
+
+message CreateUserRequest {
+	string email = 1;
+	string username = 2;
+	string display_name = 3;
+	string password = 4;
+}
+
+message CreateUserResponse {
+	string email = 1;
+	string username = 2;
+	string display_name = 3;
+}
+
+service UserService {
+	rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+}

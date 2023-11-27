@@ -4,12 +4,15 @@ services:
 
   broker-service:
     build:
-      context: ./broker-service
-      dockerfile: ./broker-service.dockerfile
+      context: ./broker-service/build
+      dockerfile: ./Dockerfile
+    depends_on:
+      - user-service
+      - post-service
     env_file: .env
     restart: always
     ports:
-      - "8080:80"
+      - ${BROKER_WEB_SERVER_PORT}:${BROKER_WEB_SERVER_PORT}
     deploy:
       mode: replicated
       replicas: 1
@@ -40,24 +43,28 @@ services:
 
   user-service:
     build:
-      context: ./user-service
-      dockerfile: ./user-service.dockerfile
+      context: ./user-service/build
+      dockerfile: ./Dockerfile
+    depends_on:
+      - user-postgres
     env_file: .env
     restart: always
     ports:
-      - "8083:80"
+      - ${USER_GRPC_SERVER_PORT}:${USER_GRPC_SERVER_PORT}
     deploy:
       mode: replicated
       replicas: 1
 
   post-service:
     build:
-      context: ./post-service
-      dockerfile: ./post-service.dockerfile
+      context: ./post-service/build
+      dockerfile: ./Dockerfile
+    depends_on:
+      - post-postgres
     env_file: .env
     restart: always
     ports:
-      - "8084:80"
+      - ${POST_GRPC_SERVER_PORT}:${POST_GRPC_SERVER_PORT}
     deploy:
       mode: replicated
       replicas: 1
@@ -84,10 +91,10 @@ services:
       - ./listener-service/data/rabbitmq/:/var/lib/rabbitmq/
 
   user-postgres:
-    image: 'postgres:15-alpine'
+    image: postgres:15-alpine
     restart: always
     ports:
-      - "9002:5432"
+      - ${USER_DB_PORT}:${USER_DB_PORT}
     deploy:
       mode: replicated
       replicas: 1
@@ -97,3 +104,18 @@ services:
       - POSTGRES_DB=${USER_DB_NAME}
     volumes:
       - ./user-service/data/postgres/:/var/lib/postgresql/data/
+
+  post-postgres:
+    image: postgres:15-alpine
+    restart: always
+    ports:
+      - ${POST_DB_PORT}:${POST_DB_PORT}
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      - POSTGRES_USER=${POST_DB_USERNAME}
+      - POSTGRES_PASSWORD=${POST_DB_PASSWORD}
+      - POSTGRES_DB=${POST_DB_NAME}
+    volumes:
+      - ./post-service/data/postgres/:/var/lib/postgresql/data/
