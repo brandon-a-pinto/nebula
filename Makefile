@@ -33,12 +33,12 @@ build_broker:
 
 build_logger:
 	@echo "Building logger binary..."
-	@cd logger-service && env GOOS=linux CGO_ENABLED=0 go build -o ${LOGGER_BINARY} ./cmd/api
+	@cd logger-service && env GOOS=linux CGO_ENABLED=0 go build -o ./build/bin/${LOGGER_BINARY} ./cmd/logger
 	@echo "Done!"
 
 build_listener:
 	@echo "Building listener binary..."
-	@cd listener-service && env GOOS=linux CGO_ENABLED=0 go build -o ${LISTENER_BINARY} ./cmd/listener
+	@cd listener-service && env GOOS=linux CGO_ENABLED=0 go build -o ./build/bin/${LISTENER_BINARY} ./cmd/listener
 	@echo "Done!"
 
 build_user:
@@ -53,6 +53,7 @@ build_post:
 
 grpc:
 	@echo "Generating gRPC files..."
+	@cd logger-service && protoc --go_out=. --go-grpc_out=. ./internal/main/grpc/protofile/*.proto
 	@cd user-service && protoc --go_out=. --go-grpc_out=. ./internal/main/grpc/protofile/*.proto
 	@cd broker-service && protoc --go_out=. --go-grpc_out=. ./internal/main/grpc/protofile/*.proto
 	@echo "Done!"

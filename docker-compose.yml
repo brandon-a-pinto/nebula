@@ -19,12 +19,14 @@ services:
       
   logger-service:
     build:
-      context: ./logger-service
-      dockerfile: ./logger-service.dockerfile
+      context: ./logger-service/build
+      dockerfile: ./Dockerfile
+    depends_on:
+      - logger-mongo
     env_file: .env
     restart: always
     ports:
-      - "8081:80"
+      - ${LOGGER_GRPC_SERVER_PORT}:${LOGGER_GRPC_SERVER_PORT}
     deploy:
       mode: replicated
       replicas: 1
@@ -73,7 +75,7 @@ services:
     image: 'mongo:5'
     restart: always
     ports:
-      - "9000:27017"
+      - ${LOGGER_DB_PORT}:27017
     deploy:
       mode: replicated
       replicas: 1
@@ -94,7 +96,7 @@ services:
     image: postgres:15-alpine
     restart: always
     ports:
-      - ${USER_DB_PORT}:${USER_DB_PORT}
+      - ${USER_DB_PORT}:5432
     deploy:
       mode: replicated
       replicas: 1
@@ -109,7 +111,7 @@ services:
     image: postgres:15-alpine
     restart: always
     ports:
-      - ${POST_DB_PORT}:${POST_DB_PORT}
+      - ${POST_DB_PORT}:5432
     deploy:
       mode: replicated
       replicas: 1

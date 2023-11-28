@@ -1,9 +1,9 @@
-package db
+package database
 
 import (
 	"context"
+	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -18,12 +18,12 @@ type MongoInstance struct {
 	DB     *mongo.Database
 }
 
-func (m *MongoInstance) Collection(name string) *mongo.Collection {
-	return m.DB.Collection(name)
+func (m *MongoInstance) Collection(colName string) *mongo.Collection {
+	return m.DB.Collection(colName)
 }
 
-func MongoDBConnection() {
-	client, err := mongo.NewClient(options.Client().ApplyURI(os.Getenv("LOGGER_DB_URI")))
+func Start(host, dbName string) {
+	client, err := mongo.NewClient(options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:27017", host)))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,6 +41,6 @@ func MongoDBConnection() {
 
 	MI = MongoInstance{
 		Client: client,
-		DB:     client.Database(os.Getenv("LOGGER_DB_NAME")),
+		DB:     client.Database(dbName),
 	}
 }

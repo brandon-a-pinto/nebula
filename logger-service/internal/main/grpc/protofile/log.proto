@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "internal/main/grpc/pb";
+
+message CreateLogRequest {
+	string msg = 1;
+	string type = 2;
+}
+
+message CreateLogResponse {}
+
+service LogService {
+	rpc CreateLog(CreateLogRequest) returns (CreateLogResponse);
+}
