@@ -2,10 +2,12 @@ package service
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/brandon-a-pinto/nebula/user-service/internal/application/usecase"
 	"github.com/brandon-a-pinto/nebula/user-service/internal/domain/dto"
 	"github.com/brandon-a-pinto/nebula/user-service/internal/main/grpc/pb"
+	"github.com/brandon-a-pinto/nebula/user-service/internal/presentation/helper"
 )
 
 type UserService struct {
@@ -28,6 +30,11 @@ func (s *UserService) CreateUser(ctx context.Context, input *pb.CreateUserReques
 	}
 
 	output, err := s.CreateUserUsecase.Exec(ctx, dto)
+	if err != nil {
+		return nil, err
+	}
+
+	err = helper.HttpLog(fmt.Sprintf("user %s (%s) was created", dto.Username, dto.Email), "INFO")
 	if err != nil {
 		return nil, err
 	}

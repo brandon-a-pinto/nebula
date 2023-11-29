@@ -5,6 +5,7 @@ import (
 
 	"github.com/brandon-a-pinto/nebula/user-service/internal/domain/dto"
 	"github.com/brandon-a-pinto/nebula/user-service/internal/domain/validation"
+	"github.com/brandon-a-pinto/nebula/user-service/pkg/domain/entity"
 	"github.com/google/uuid"
 )
 
@@ -21,6 +22,7 @@ type User struct {
 
 func NewUser(input dto.CreateUserInput) (*User, error) {
 	user := &User{
+		ID:          entity.NewID(),
 		Email:       input.Email,
 		Username:    input.Username,
 		DisplayName: input.DisplayName,
