@@ -23,7 +23,7 @@ func HttpLog(msg, typ string) error {
 		return err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("broker-service:%s/logs", config.BrokerServerPort), bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("http://broker-service:%s/logs", config.BrokerServerPort), bytes.NewBuffer(jsonValue))
 	if err != nil {
 		return err
 	}
