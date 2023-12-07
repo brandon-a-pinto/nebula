@@ -2,7 +2,7 @@
 
 A social media fullstack project using microservices architecture.
 
-## Install
+## Usage
 
 ``` bash
 git clone https://github.com/brandon-a-pinto/nebula.git
@@ -14,7 +14,10 @@ sudo make up_build
 ## Technologies
 
 - Golang
-- Gofiber
+- TypeScript
+- React
+- gRPC
+- RabbitMQ
 - PostgreSQL
 - MongoDB
 - Docker
