@@ -25,8 +25,12 @@ func (s *WebServer) routes() {
 	userHandler := handler.NewUserHandler(
 		*factory.CreateUserFactory(),
 	)
+	logHandler := handler.NewLogHandler(
+		*factory.CreateLogFactory(),
+	)
 
 	s.Router.Post("/users", userHandler.CreateUser)
+	s.Router.Post("/logs", logHandler.CreateLog)
 }
 
 func (s *WebServer) Start() {
